@@ -14,9 +14,6 @@
     "require": {
         "php": ">=5.3"
     },
-    "suggest": {
-        "kijtra/Config": "HTML head tag helper"
-    },
     "autoload": {
         "files": ["src/functions.php"],
         "psr-4": {
