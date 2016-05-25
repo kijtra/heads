@@ -1,0 +1,26 @@
+{
+    "name": "kijtra/heads",
+    "description": "HTML head tag helper",
+    "type": "library",
+    "keywords": ["PHP", "Helper"],
+    "homepage": "https://github.com/kijtra/heads",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "kijtra",
+            "email": "kijtra@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3"
+    },
+    "suggest": {
+        "kijtra/Config": "HTML head tag helper"
+    },
+    "autoload": {
+        "files": ["src/functions.php"],
+        "psr-4": {
+            "Kijtra\\": "src/"
+        }
+    }
+}
