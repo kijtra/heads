@@ -5,9 +5,13 @@ HTML `<head>` tag helper for PHP.
 
 ## Usage
 
+```sh
+composer.phar require kijtra/heads
+```
+
 ```php
 <?php
-require '/path/to/kijtra/heads/autoload.php';
+require '/path/to/autoload.php';
 use Kijtra\Heads;
 ```
 
