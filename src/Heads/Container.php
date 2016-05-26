@@ -45,6 +45,14 @@ class Container
      */
     public static function set($type, array $data)
     {
+        // Multi data
+        if (empty($data['tag']) && array_key_exists(0, $data)) {
+            foreach($data as $val) {
+                self::set($type, $val);
+            }
+            return;
+        }
+
         if (empty(self::$datas[$type])) {
             self::$datas[$type] = array();
         }
@@ -83,5 +91,13 @@ class Container
         if (!empty(self::$datas[$type][$key])) {
             unset(self::$datas[$type][$key]);
         }
+    }
+
+    /**
+     * Clear all data
+     */
+    public static function clear()
+    {
+        self::$datas = array();
     }
 }
