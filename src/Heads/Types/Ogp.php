@@ -13,6 +13,20 @@ class Ogp extends HeadsTypes
     protected static $tag = 'meta';
 
     /**
+     * Available meta name (no '-', no '_', lower)
+     * @var array
+     */
+    protected static $availables = array(
+        'url',
+        'type',
+        'title',
+        'image',
+        'description',
+        'sitename',
+        'locale',
+    );
+
+    /**
      * Normalize key name (override)
      * @param  string $name  meta name
      * @return string
@@ -30,10 +44,10 @@ class Ogp extends HeadsTypes
      */
     public static function set($name, $value, array $attr = array())
     {
-        $name = self::key($name);
-        $attrs['name'] = 'og:'.$name;
+        $_name = self::key($name);
+        $attrs['property'] = 'og:'.preg_replace('/\Aog:/i', '', $name);
         $attrs['content'] = $value;
-        $data = self::data($name, $attrs);
+        $data = self::data($_name, $attrs);
         HeadsContainer::set('ogp', $data);
     }
 
@@ -49,7 +63,7 @@ class Ogp extends HeadsTypes
      */
     private static function _title($value, array $attrs = array())
     {
-        $attrs['name'] = 'og:title';
+        $attrs['property'] = 'og:title';
         $attrs['content'] = $value;
         return self::data(__FUNCTION__, $attrs);
     }
@@ -66,7 +80,7 @@ class Ogp extends HeadsTypes
             return;
         }
 
-        $attrs['name'] = 'og:image';
+        $attrs['property'] = 'og:image';
         $attrs['content'] = $value;
         return self::data(__FUNCTION__, $attrs);
     }

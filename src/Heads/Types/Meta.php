@@ -16,7 +16,7 @@ class Meta extends HeadsTypes
      * Available meta name (no '-', no '_', lower)
      * @var array
      */
-    protected static $names = array(
+    protected static $availables = array(
         'description'
     );
 
@@ -30,6 +30,9 @@ class Meta extends HeadsTypes
     {
         $attrs['name'] = $name;
         $attrs['content'] = $value;
+        if (is_string($attr)) {
+            $attrs['title'] = $attr;
+        }
         $data = self::data($name, $attrs);
         HeadsContainer::set('meta', $data);
     }

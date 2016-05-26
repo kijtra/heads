@@ -6,7 +6,9 @@ use \Kijtra\Heads\Types\Meta as HeadsMeta;
 use \Kijtra\Heads\Types\Http as HeadsHttp;
 use \Kijtra\Heads\Types\Link as HeadsLink;
 use \Kijtra\Heads\Types\Ogp as HeadsOgp;
+use \Kijtra\Heads\Types\Facebook as HeadsFacebook;
 use \Kijtra\Heads\Types\Twitter as HeadsTwitter;
+use \Kijtra\Heads\Types\AppleLink as HeadsAppleLink;
 
 /**
  * @link https://www.w3.org/TR/html5/document-metadata.html
@@ -27,6 +29,7 @@ class Heads
             'ogp',
             'facebook',
             'twitter',
+            'applelink',
             'link',
         ),
     );
@@ -70,31 +73,26 @@ class Heads
             return;
         }
 
-        // Add <meta>
-        if (self::meta($name, $value, $attrs)) {
-            return;
-        }
+        $lower = strtolower($name);
 
-        // Add http-equiv (<meta>)
-        if (self::http($name, $value, $attrs)) {
-            return;
-        }
-
-        // Add <link>
-        if (self::link($name, $value, $attrs)) {
-            return;
-        }
-
-        // Add OGP (<meta>)
-        if (self::ogp($name, $value, $attrs)) {
-            return;
-        }
-
-        // Add Other (force <meta>)
-        if (0 === strpos(strtolower($name), 'x-')) {
-            HeadsHttp::set($name, $value, $attrs);
-        } elseif (!preg_match('/\A(og|fb|twitter):/i', $name)) {
-            HeadsMeta::set($name, $value, $attrs);
+        if (0 === strncmp($lower, 'og:', 3)) {
+            self::ogp($name, $value, $attrs);
+        } elseif (0 === strncmp($lower, 'fb:', 3)) {
+            self::facebook($name, $value, $attrs);
+        } elseif (0 === strncmp($lower, 'twitter:', 8)) {
+            self::twitter($name, $value, $attrs);
+        } elseif (0 === strncmp($lower, 'al:', 3)) {
+            self::applelink($name, $value, $attrs);
+        } elseif (!self::meta($name, $value, $attrs)) {
+            if (!self::http($name, $value, $attrs)) {
+                if (!self::link($name, $value, $attrs)) {
+                    if (0 === strpos(strtolower($name), 'x-')) {
+                        HeadsHttp::set($name, $value, $attrs);
+                    } elseif (!preg_match('/\A(og|fb|twitter|al):/i', $name)) {
+                        HeadsMeta::set($name, $value, $attrs);
+                    }
+                }
+            }
         }
     }
 
@@ -116,24 +114,39 @@ class Heads
      */
     public static function remove($name)
     {
-        if (HeadsMeta::has($name)) {
+        $lower = strtolower($name);
+
+        if (0 === strncmp($lower, 'og:', 3)) {
+            HeadsContainer::remove('ogp', HeadsOgp::key($name));
+        } elseif (0 === strncmp($lower, 'fb:', 3)) {
+            HeadsContainer::remove('facebook', HeadsFacebook::key($name));
+        } elseif (0 === strncmp($lower, 'twitter:', 8)) {
+            HeadsContainer::remove('twitter', HeadsTwitter::key($name));
+        } elseif (0 === strncmp($lower, 'al:', 3)) {
+            HeadsContainer::remove('applelink', HeadsAppleLink::key($name));
+        } elseif (HeadsMeta::has($name)) {
             HeadsContainer::remove('meta', HeadsMeta::key($name));
         } elseif (HeadsLink::has($name)) {
             HeadsContainer::remove('link', HeadsLink::key($name));
         } elseif (HeadsHttp::has($name)) {
             HeadsContainer::remove('http', HeadsHttp::key($name));
-        } elseif (HeadsOgp::has($name)) {
-            HeadsContainer::remove('ogp', HeadsOgp::key($name));
         } else {
             // Other http-equiv
             if (0 === strpos(strtolower($name), 'x-')) {
                 HeadsContainer::remove('http', $name);
-            } elseif (!preg_match('/\A(og|fb|twitter):/i', $name)) {
+            } elseif (!preg_match('/\A(og|fb|twitter|al):/i', $name)) {
                 HeadsContainer::remove('meta', $name);
             }
         }
     }
 
+    /**
+     * Clear all data
+     */
+    public static function clear()
+    {
+        HeadsContainer::clear();
+    }
 
     /**
      * Add meta data
@@ -196,7 +209,7 @@ class Heads
     }
 
     /**
-     * Add link data
+     * Add OpenGraph data
      * @param string $name   meta name
      * @param mixed  $value  meta value, If set 'false' to remove tag data
      * @param mixed  $attr   Extra attributes
@@ -224,6 +237,88 @@ class Heads
     public static function og($name, $value, $attrs = array())
     {
         self::ogp($name, $value, $attrs);
+    }
+
+    /**
+     * Add Facebook OpenGraph data
+     * @param string $name   meta name
+     * @param mixed  $value  meta value, If set 'false' to remove tag data
+     * @param mixed  $attr   Extra attributes
+     * @return bool
+     */
+    public static function facebook($name, $value, $attrs = array())
+    {
+        if (HeadsFacebook::has($name)) {
+            if ($data = HeadsFacebook::get($name, $value, $attrs)) {
+                HeadsContainer::set('facebook', $data);
+            } else {
+                HeadsFacebook::set($name, $value, $attrs);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Alias of facebook()
+     * @param string $name   meta name
+     * @param mixed  $value  meta value, If set 'false' to remove tag data
+     * @param mixed  $attr   Extra attributes
+     */
+    public static function fb($name, $value, $attrs = array())
+    {
+        self::facebook($name, $value, $attrs);
+    }
+
+    /**
+     * Add Twitter Card data
+     * @param string $name   meta name
+     * @param mixed  $value  meta value, If set 'false' to remove tag data
+     * @param mixed  $attr   Extra attributes
+     * @return bool
+     */
+    public static function twitter($name, $value, $attrs = array())
+    {
+        if (HeadsTwitter::has($name)) {
+            if ($data = HeadsTwitter::get($name, $value, $attrs)) {
+                HeadsContainer::set('twitter', $data);
+            } else {
+                HeadsTwitter::set($name, $value, $attrs);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Add Apple Link data
+     * @param string $name   meta name
+     * @param mixed  $value  meta value, If set 'false' to remove tag data
+     * @param mixed  $attr   Extra attributes
+     * @return bool
+     */
+    public static function applelink($name, $value, $attrs = array())
+    {
+        if (HeadsAppleLink::has($name)) {
+            if ($data = HeadsAppleLink::get($name, $value, $attrs)) {
+                HeadsContainer::set('applelink', $data);
+            } else {
+                HeadsAppleLink::set($name, $value, $attrs);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Alias of applelink()
+     * @param string $name   meta name
+     * @param mixed  $value  meta value, If set 'false' to remove tag data
+     * @param mixed  $attr   Extra attributes
+     */
+    public static function al($name, $value, $attrs = array())
+    {
+        self::applelink($name, $value, $attrs);
     }
 
     /**

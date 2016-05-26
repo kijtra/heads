@@ -24,11 +24,11 @@ class Types
      */
     public static function has($name)
     {
-        $name = self::key($name);
+        $name = static::key($name);
         if (method_exists(get_called_class(), '_'.$name)) {
             return true;
-        } elseif(!empty(static::$names)) {
-            return (false !== array_search($name, static::$names));
+        } elseif(!empty(static::$availables)) {
+            return (false !== array_search($name, static::$availables));
         }
         return false;
     }

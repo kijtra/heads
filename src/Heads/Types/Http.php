@@ -16,10 +16,16 @@ class Http extends HeadsTypes
      * Available meta name (no '-', no '_', lower)
      * @var array
      */
-    protected static $names = array(
+    protected static $availables = array(
         'defaultstyle',
         'cachecontrol',
         'pragma',
+        'cleartype',
+        'imagetoolbar',
+        'pageenter',
+        'pageexit',
+        'siteenter',
+        'siteexit',
     );
 
     /**
