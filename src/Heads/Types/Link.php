@@ -85,7 +85,12 @@ class Link extends HeadsTypes
      */
     protected static function _css($value, array $attrs = array())
     {
-        return self::set('stylesheet', $value, $attrs);
+        $attrs['rel'] = 'stylesheet';
+        $attrs['href'] = $value;
+        if (is_string($attrs)) {
+            $attrs['title'] = $attr;
+        }
+        return self::data('stylesheet', $attrs, true);
     }
 
     /**
