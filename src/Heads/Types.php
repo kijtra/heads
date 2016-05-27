@@ -42,7 +42,7 @@ class Types
      */
     public static function get($name, $value, $attr = array())
     {
-        $method = '_'.self::key($name);
+        $method = '_'.static::key($name);
         if (method_exists(get_called_class(), $method)) {
             return static::$method($value, $attr);
         }
