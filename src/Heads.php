@@ -32,6 +32,17 @@ class Heads
             'applelink',
             'link',
         ),
+        'namespace' => array(
+            'og' => 'http://ogp.me/ns',
+            'fb' => 'http://ogp.me/ns/fb',
+            'op' => 'http://media.facebook.com/op',
+            'music' => 'http://ogp.me/ns/music',
+            'video' => 'http://ogp.me/ns/video',
+            'article' => 'http://ogp.me/ns/article',
+            'book' => 'http://ogp.me/ns/book',
+            'profile' => 'http://ogp.me/ns/profile',
+            'website' => 'http://ogp.me/ns/website',
+        ),
     );
 
     /**
@@ -351,7 +362,11 @@ class Heads
                 foreach($rows as $row) {
                     $attr = array();
                     foreach($row['attrs'] as $name => $val) {
-                        $attr[] = $name.'="'.htmlspecialchars($val, ENT_QUOTES).'"';
+                        if (!is_scalar($val)) {
+                            $attr[] = $name.'=""';
+                        } else {
+                            $attr[] = $name.'="'.htmlspecialchars($val, ENT_QUOTES).'"';
+                        }
                     }
                     $htmls[$type][] = '<'.$row['tag'].' '.implode(' ', $attr).'>';
                 }
@@ -390,5 +405,61 @@ class Heads
     public static function print(array $options = array())
     {
         echo self::html($options);
+    }
+
+    /**
+     * Get Open Graph Namespaces
+     * @return string  prefix HTML attribute
+     */
+    public static function namespace()
+    {
+        $datas = HeadsContainer::datas();
+        if (empty($datas) || empty(self::$options['namespace'])) {
+            return;
+        }
+
+        $options = self::$options['namespace'];
+        $prefixes = array();
+        foreach($datas as $type => $values) {
+            foreach($values as $key => $rows) {
+                foreach($rows as $row) {
+                    if (empty($row['attrs']['property'])) {
+                        continue;
+                    }
+
+                    $prop = $row['attrs']['property'];
+                    $ns = substr($prop, 0, strpos($prop, ':'));
+                    if (!empty($options[$ns])) {
+                        $prefixes[$ns] = $ns.': '.$options[$ns].'#';
+                    }
+                    if ('og:type' === $prop && !empty($row['attrs']['content'])) {
+                        $ns = $row['attrs']['content'];
+                        if (!empty($options[$ns])) {
+                            $prefixes[$ns] = $ns.': '.$options[$ns].'#';
+                        }
+                    }
+                }
+            }
+        }
+
+        if (empty($prefixes)) {
+            return;
+        }
+
+        return $prefixes;
+    }
+
+    /**
+     * Print html prefixes
+     * @return string  prefix HTML attribute
+     */
+    public static function prefix()
+    {
+        if (!$prefixes = self::namespace()) {
+            return;
+        }
+
+        $html = 'prefix="'.implode(' ', $prefixes).'"';
+        return $html;
     }
 }
