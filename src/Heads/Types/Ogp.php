@@ -54,34 +54,4 @@ class Ogp extends HeadsTypes
 
     // Data methods ////////////////////////////////////////////////////////////
 
-
-    /**
-     * OGP title
-     * @param  mixed $value  If array to string
-     * @param  array $attr   Extra attributes
-     * @return array         Tag data
-     */
-    private static function _title($value, array $attrs = array())
-    {
-        $attrs['property'] = 'og:title';
-        $attrs['content'] = $value;
-        return self::data(__FUNCTION__, $attrs);
-    }
-
-    /**
-     * OGP image
-     * @param  mixed $value  If array to string
-     * @param  array $attr   Extra attributes
-     * @return array         Tag data
-     */
-    private static function _image($value, array $attrs = array())
-    {
-        if ('/' !== $value{0} && !filter_var($value, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED)) {
-            return;
-        }
-
-        $attrs['property'] = 'og:image';
-        $attrs['content'] = $value;
-        return self::data(__FUNCTION__, $attrs);
-    }
 }
