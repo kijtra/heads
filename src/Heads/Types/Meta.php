@@ -28,13 +28,19 @@ class Meta extends HeadsTypes
      */
     public static function set($name, $value, array $attr = array())
     {
-        $attrs['name'] = $name;
+        if (false !== strpos($name, ':')) {
+            $type = 'ogp';
+            $attrs['property'] = $name;
+        } else {
+            $type = 'meta';
+            $attrs['name'] = $name;
+        }
         $attrs['content'] = $value;
         if (is_string($attr)) {
             $attrs['title'] = $attr;
         }
         $data = self::data($name, $attrs);
-        HeadsContainer::set('meta', $data);
+        HeadsContainer::set($type, $data);
     }
 
 
