@@ -226,8 +226,15 @@ class Heads
      * @param mixed  $attr   Extra attributes
      * @return bool
      */
-    public static function ogp($name, $value, $attrs = array())
+    public static function ogp($name, $value = null, $attrs = array())
     {
+        if (is_array($name)) {
+            foreach($name as $key => $val) {
+                self::ogp($key, $val);
+            }
+            return true;
+        }
+
         if (HeadsOgp::has($name)) {
             if ($data = HeadsOgp::get($name, $value, $attrs)) {
                 HeadsContainer::set('ogp', $data);
@@ -245,7 +252,7 @@ class Heads
      * @param mixed  $value  meta value, If set 'false' to remove tag data
      * @param mixed  $attr   Extra attributes
      */
-    public static function og($name, $value, $attrs = array())
+    public static function og($name, $value = null, $attrs = array())
     {
         self::ogp($name, $value, $attrs);
     }
@@ -257,8 +264,15 @@ class Heads
      * @param mixed  $attr   Extra attributes
      * @return bool
      */
-    public static function facebook($name, $value, $attrs = array())
+    public static function facebook($name, $value = null, $attrs = array())
     {
+        if (is_array($name)) {
+            foreach($name as $key => $val) {
+                self::facebook($key, $val);
+            }
+            return true;
+        }
+
         if (HeadsFacebook::has($name)) {
             if ($data = HeadsFacebook::get($name, $value, $attrs)) {
                 HeadsContainer::set('facebook', $data);
@@ -276,7 +290,7 @@ class Heads
      * @param mixed  $value  meta value, If set 'false' to remove tag data
      * @param mixed  $attr   Extra attributes
      */
-    public static function fb($name, $value, $attrs = array())
+    public static function fb($name, $value = null, $attrs = array())
     {
         self::facebook($name, $value, $attrs);
     }
@@ -288,8 +302,17 @@ class Heads
      * @param mixed  $attr   Extra attributes
      * @return bool
      */
-    public static function twitter($name, $value, $attrs = array())
+    public static function twitter($name, $value = null, $attrs = array())
     {
+        if (is_array($name)) {
+            if (!empty($name['card'])) {
+                foreach($name as $key => $val) {
+                    self::twitter($key, $val);
+                }
+            }
+            return true;
+        }
+
         if (HeadsTwitter::has($name)) {
             if ($data = HeadsTwitter::get($name, $value, $attrs)) {
                 HeadsContainer::set('twitter', $data);
@@ -308,8 +331,17 @@ class Heads
      * @param mixed  $attr   Extra attributes
      * @return bool
      */
-    public static function applelink($name, $value, $attrs = array())
+    public static function applelink($name, $value = null, $attrs = array())
     {
+        if (is_array($name)) {
+            if (!empty($name['ios:url'])) {
+                foreach($name as $key => $val) {
+                    self::applelink($key, $val);
+                }
+            }
+            return true;
+        }
+
         if (HeadsAppleLink::has($name)) {
             if ($data = HeadsAppleLink::get($name, $value, $attrs)) {
                 HeadsContainer::set('applelink', $data);
@@ -327,7 +359,7 @@ class Heads
      * @param mixed  $value  meta value, If set 'false' to remove tag data
      * @param mixed  $attr   Extra attributes
      */
-    public static function al($name, $value, $attrs = array())
+    public static function al($name, $value = null, $attrs = array())
     {
         self::applelink($name, $value, $attrs);
     }
