@@ -52,6 +52,7 @@ class Link extends HeadsTypes
         'appletouchstartupimage',
         'maskicon',
         'chromewebstoreitem',
+        'publisher',
     );
 
 
